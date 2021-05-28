@@ -1,0 +1,13 @@
+
+#import <DataDefinition.bdtd>
+
+object ITestRoot
+{
+    TestRoot
+    {
+        RootName            [ get, set ];
+    }
+};
+
+create (ITestRoot);
+

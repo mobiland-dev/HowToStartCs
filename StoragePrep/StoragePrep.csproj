@@ -60,5 +60,8 @@
       <Link>DataDefinition.dtdl</Link>
     </DTDLFile>
   </ItemGroup>
+  <ItemGroup>
+    <DADLFile Include="PrepareDefinition.dadl" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
