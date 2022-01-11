@@ -8,7 +8,7 @@ using DataFoundationAccess;
 
 namespace StoragePrep
 {
-    class Program
+    class StoragePrep
     {
         static readonly Guid guidRootName = new Guid("{56F8EB44-B7E3-4564-B9A6-22E5E1B9110C}");
 
@@ -21,21 +21,21 @@ namespace StoragePrep
             UInt32 ulStorageId = 0;
 
             // connect
-            DataFoundation.ThreadInit.InitializeThread();
+            ThreadInit.InitializeThread();
 
-            WDomain pWDomain = WDomain.New();
-            if (0 > (pWDomain.Initialize()))
+            WDomain pWDomain = WDomain.Create();
+            if (0 > (pWDomain.Initialize(guidDomainId)))
             {
-                WDomain.Delete(pWDomain);
-                DataFoundation.ThreadInit.UninitializeThread();
+                WDomain.Destroy(pWDomain);
+                ThreadInit.UninitializeThread();
                 return;
             }
 
-            if (0 > (pWDomain.Connect(strServerAddress, usServerPort, guidDomainId, null)))
+            if (0 > (pWDomain.Connect(strServerAddress, usServerPort, null)))
             {
                 pWDomain.Uninitialize();
-                WDomain.Delete(pWDomain);
-                DataFoundation.ThreadInit.UninitializeThread();
+                WDomain.Destroy(pWDomain);
+                ThreadInit.UninitializeThread();
                 return;
             }
 
@@ -43,8 +43,8 @@ namespace StoragePrep
             {
                 pWDomain.DisconnectAll();
                 pWDomain.Uninitialize();
-                WDomain.Delete(pWDomain);
-                DataFoundation.ThreadInit.UninitializeThread();
+                WDomain.Destroy(pWDomain);
+                ThreadInit.UninitializeThread();
                 return;
             }
 
@@ -54,18 +54,17 @@ namespace StoragePrep
             // create named object
 
             ITestRoot pRootObject;
-
-            PrepareDefinition.Create(pWDomain, out pRootObject);
+            ITestRoot.Create(out pRootObject, pWDomain);
 
             pRootObject.SetRootName("first test root");
 
-            pRootObject.StoreData(WDomain.TRANSACTION_STORE);
+            pRootObject.StoreData(Transaction.Store);
 
-            pWDomain.InsertNamedObject(pRootObject.BuildLink(true), guidRootName, "first entry point", WDomain.TRANSACTION_STORE);
+            pWDomain.InsertNamedObject(pRootObject.BuildLink(true), guidRootName, "first entry point", Transaction.Store);
 
-            pWDomain.Execute(WDomain.TRANSACTION_STORE);
+            pWDomain.Execute(Transaction.Store);
 
-            pRootObject.Release();
+            pRootObject.Dispose();
 
             // unbind types
             PrepareDefinition.Unbind();
@@ -75,8 +74,8 @@ namespace StoragePrep
             pWDomain.ReleaseStorage(ulStorageId);
             pWDomain.DisconnectAll();
             pWDomain.Uninitialize();
-            WDomain.Delete(pWDomain);
-            DataFoundation.ThreadInit.UninitializeThread();
+            WDomain.Destroy(pWDomain);
+            ThreadInit.UninitializeThread();
         }
     }
 }

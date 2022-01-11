@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SchemaPrep
 {
-    class Program
+    class SchemaPrep
     {
         static void Main(string[] args)
         {
@@ -39,7 +39,7 @@ namespace SchemaPrep
             {
                 pSchema.CreateFromBinary(pBdtd);
                 pSchema.Commit();
-                pSchema.Release();
+                pSchema.Dispose();
             }
 
             pConnection.Disconnect();

@@ -9,5 +9,3 @@ object ITestRoot
     }
 };
 
-create (ITestRoot);
-

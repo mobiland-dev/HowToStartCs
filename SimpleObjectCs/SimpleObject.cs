@@ -8,7 +8,7 @@ using DataFoundationAccess;
 
 namespace SimpleObjectCs
 {
-    class Program
+    class SimpleObject
     {
         static readonly Guid guidRootName = new Guid("{56F8EB44-B7E3-4564-B9A6-22E5E1B9110C}");
 
@@ -21,21 +21,21 @@ namespace SimpleObjectCs
             UInt32 ulStorageId = 0;
 
             // connect
-            DataFoundation.ThreadInit.InitializeThread();
+            ThreadInit.InitializeThread();
 
-            WDomain pWDomain = WDomain.New();
-            if (0 > (pWDomain.Initialize()))
+            WDomain pWDomain = WDomain.Create();
+            if (0 > (pWDomain.Initialize(guidDomainId)))
             {
-                WDomain.Delete(pWDomain);
-                DataFoundation.ThreadInit.UninitializeThread();
+                WDomain.Destroy(pWDomain);
+                ThreadInit.UninitializeThread();
                 return;
             }
 
-            if (0 > (pWDomain.Connect(strServerAddress, usServerPort, guidDomainId, null)))
+            if (0 > (pWDomain.Connect(strServerAddress, usServerPort, null)))
             {
                 pWDomain.Uninitialize();
-                WDomain.Delete(pWDomain);
-                DataFoundation.ThreadInit.UninitializeThread();
+                WDomain.Destroy(pWDomain);
+                ThreadInit.UninitializeThread();
                 return;
             }
 
@@ -43,8 +43,8 @@ namespace SimpleObjectCs
             {
                 pWDomain.DisconnectAll();
                 pWDomain.Uninitialize();
-                WDomain.Delete(pWDomain);
-                DataFoundation.ThreadInit.UninitializeThread();
+                WDomain.Destroy(pWDomain);
+                ThreadInit.UninitializeThread();
                 return;
             }
 
@@ -53,15 +53,14 @@ namespace SimpleObjectCs
 
             // open named object
 
-            DataFoundation.ObjectId oiRootObject;
-
-            pWDomain.QueryNamedObjectId(guidRootName, out oiRootObject);
+            DataFoundation.ObjectId[] aoiRootObject;
+            pWDomain.QueryNamedObjectId(new Guid[] { guidRootName }, out aoiRootObject);
 
             ITestRoot pRootObject;
-            AccessDefinition.Open(pWDomain, out pRootObject, oiRootObject, WDomain.TRANSACTION_LOAD);
+            ITestRoot.Open(out pRootObject, aoiRootObject[0], pWDomain, Transaction.Load);
 
-            pRootObject.Load(_ITestRoot.ALL_ATTRIBUTES, WDomain.TRANSACTION_LOAD);
-            pWDomain.Execute(WDomain.TRANSACTION_LOAD);
+            pRootObject.Load(_ITestRoot.ALL_ATTRIBUTES, Transaction.Load);
+            pWDomain.Execute(Transaction.Load);
 
             // open the list for writing
 
@@ -71,8 +70,7 @@ namespace SimpleObjectCs
             // create an add a new object
 
             ITestObject pTestObject;
-
-            pRootObject.Create(out pTestObject);
+            ITestObject.Create(out pTestObject, pRootObject);
 
             TestObjectListItem itm = new TestObjectListItem();
             itm.anObject = pTestObject.BuildLink(true);
@@ -84,13 +82,13 @@ namespace SimpleObjectCs
             pTestObject.SetText("something");
             pTestObject.SetNumber(343);
 
-            pTestObject.StoreData(WDomain.TRANSACTION_STORE);
-            pRootObject.StoreData(WDomain.TRANSACTION_STORE);
+            pTestObject.StoreData(Transaction.Store);
+            pRootObject.StoreData(Transaction.Store);
 
-            pWDomain.Execute(WDomain.TRANSACTION_STORE);
+            pWDomain.Execute(Transaction.Store);
 
-            pTestObject.Release();
-            pRootObject.Release();
+            pTestObject.Dispose();
+            pRootObject.Dispose();
 
             // unbind types
             AccessDefinition.Unbind();
@@ -100,8 +98,8 @@ namespace SimpleObjectCs
             pWDomain.ReleaseStorage(ulStorageId);
             pWDomain.DisconnectAll();
             pWDomain.Uninitialize();
-            WDomain.Delete(pWDomain);
-            DataFoundation.ThreadInit.UninitializeThread();
+            WDomain.Destroy(pWDomain);
+            ThreadInit.UninitializeThread();
         }
     }
 }
