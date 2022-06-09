@@ -21,6 +21,7 @@ namespace StoragePrep
             UInt32 ulStorageId = 0;
 
             // connect
+
             ThreadInit.InitializeThread();
 
             WDomain pWDomain = WDomain.Create();
