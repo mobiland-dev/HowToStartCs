@@ -16,6 +16,7 @@ namespace SchemaPrep
             Guid guidDomainId = Guid.Parse(args[2]);
 
             // connect
+
             DataFoundation.ThreadInit.InitializeThread();
 
             DataFoundation.Connection pConnection = DataFoundation.Connection.Create();
@@ -28,6 +29,7 @@ namespace SchemaPrep
             }
 
             // extend schema
+
             Stream sBdtd = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("DataDefinition");
 
             Byte[] pBdtd = new Byte[sBdtd.Length];

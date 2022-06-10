@@ -21,6 +21,7 @@ namespace SimpleObjectCs
             UInt32 ulStorageId = 0;
 
             // connect
+
             ThreadInit.InitializeThread();
 
             WDomain pWDomain = WDomain.Create();
@@ -49,6 +50,7 @@ namespace SimpleObjectCs
             }
 
             // bind types
+
             AccessDefinition.Bind(pWDomain);
 
             // open named object
@@ -91,6 +93,7 @@ namespace SimpleObjectCs
             pRootObject.Dispose();
 
             // unbind types
+
             AccessDefinition.Unbind();
 
             // disconnect

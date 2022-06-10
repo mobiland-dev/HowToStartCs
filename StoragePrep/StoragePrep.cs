@@ -50,6 +50,7 @@ namespace StoragePrep
             }
 
             // bind types
+
             PrepareDefinition.Bind(pWDomain);
 
             // create named object
@@ -68,6 +69,7 @@ namespace StoragePrep
             pRootObject.Dispose();
 
             // unbind types
+
             PrepareDefinition.Unbind();
 
             // disconnect
