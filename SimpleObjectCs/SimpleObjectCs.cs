@@ -2,9 +2,9 @@
 
 using DataFSAccess;
 
-namespace StoragePrep
+namespace SimpleObjectCs
 {
-    class StoragePrep
+    class SimpleObject
     {
         static readonly Guid guidRootName = new Guid("{56F8EB44-B7E3-4564-B9A6-22E5E1B9110C}");
 
@@ -62,26 +62,50 @@ namespace StoragePrep
 
             // bind types
 
-            PrepareDefinition.Bind(pWDomain);
+            AccessDefinition.Bind(pWDomain);
 
-            // create named object
+            // open named object
+
+            DataFS.Array<DataFS.ObjectId> aoiRootObject = new DataFS.Array<DataFS.ObjectId>();
+            pWDomain.QueryNamedLinkId(new Guid[] { guidRootName }, aoiRootObject, null);
 
             TestRoot pRootObject;
-            TestRoot.Create(out pRootObject, pWDomain, DataFS.ObjectId.OBJECTID_NULL);
+            TestRoot.Open(out pRootObject, pWDomain, aoiRootObject.pData[0], 0, Transaction.Load);
 
-            pRootObject.SetRootName("first test root");
+            pRootObject.Load(_TestRoot.ALL_ATTRIBUTES, Transaction.Load);
+            pWDomain.Execute(Transaction.Load, null);
 
+            // open the list for writing
+
+            TestObjectList pList;
+            pRootObject.SetAllObjects(out pList);
+
+            // create an add a new object
+
+            TestObject pTestObject;
+            TestObject.Create(out pTestObject, pRootObject.GetObject());
+
+            TestObjectListItem itm = new TestObjectListItem();
+            itm.anObject = pTestObject.BuildLink(true);
+            itm.theType = 12;
+
+            uint idx;
+            pList.Insert(out idx, itm);
+
+            pTestObject.SetText("something");
+            pTestObject.SetNumber(343);
+
+            pTestObject.StoreData(Transaction.Store);
             pRootObject.StoreData(Transaction.Store);
-
-            pWDomain.InsertNamedLink(pRootObject.BuildLink(true), guidRootName, "first entry point", Transaction.Store);
 
             pWDomain.Execute(Transaction.Store, null);
 
+            pTestObject.Dispose();
             pRootObject.Dispose();
 
             // unbind types
 
-            PrepareDefinition.Unbind();
+            AccessDefinition.Unbind();
 
             // destroy domain
 

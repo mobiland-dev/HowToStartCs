@@ -1,9 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SchemaPrep
 {
@@ -17,14 +13,14 @@ namespace SchemaPrep
 
             // connect
 
-            DataFoundation.ThreadInit.InitializeThread();
+            DataFS.ThreadInit.InitializeThread();
 
-            DataFoundation.Connection pConnection = DataFoundation.Connection.Create();
+            DataFS.Connection pConnection = DataFS.Connection.Create();
 
             if (0 > (pConnection.Connect(strServerAddress, usServerPort, null)))
             {
-                DataFoundation.Connection.Destroy(pConnection);
-                DataFoundation.ThreadInit.UninitializeThread();
+                DataFS.Connection.Destroy(pConnection);
+                DataFS.ThreadInit.UninitializeThread();
                 return;
             }
 
@@ -35,7 +31,7 @@ namespace SchemaPrep
             Byte[] pBdtd = new Byte[sBdtd.Length];
             sBdtd.Read(pBdtd, 0, (int)sBdtd.Length);
 
-            DataFoundation.USchemaEdit pSchema;
+            DataFS.USchemaEdit pSchema;
 
             if (0 <= (pConnection.QuerySchemaEdit(out pSchema, guidDomainId)))
             {
@@ -45,8 +41,8 @@ namespace SchemaPrep
             }
 
             pConnection.Disconnect();
-            DataFoundation.Connection.Destroy(pConnection);
-            DataFoundation.ThreadInit.UninitializeThread();
+            DataFS.Connection.Destroy(pConnection);
+            DataFS.ThreadInit.UninitializeThread();
         }
     }
 }
