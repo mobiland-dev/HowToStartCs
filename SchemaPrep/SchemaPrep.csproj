@@ -19,10 +19,10 @@
 
   <ItemGroup>
     <Reference Include="DataFS.net">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Mobiland DataFS SDK\Api\bin\x64\DataFS.net.dll</HintPath>
+      <HintPath>$(MSBuildProgramFiles32)\Mobiland DataFS SDK\Api\bin\x64\DataFS.net.dll</HintPath>
     </Reference>
     <Reference Include="DataFSAccess.net">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Mobiland DataFS SDK\Api\bin\x64\DataFSAccess.net.dll</HintPath>
+      <HintPath>$(MSBuildProgramFiles32)\Mobiland DataFS SDK\Api\bin\x64\DataFSAccess.net.dll</HintPath>
     </Reference>
   </ItemGroup>
 
