@@ -4,97 +4,97 @@ using DataFSAccess;
 
 namespace StoragePrep
 {
-    class StoragePrep
-    {
-        static readonly Guid guidRootName = new Guid("{56F8EB44-B7E3-4564-B9A6-22E5E1B9110C}");
+	class StoragePrep
+	{
+		static readonly Guid guidRootName = new Guid("{56F8EB44-B7E3-4564-B9A6-22E5E1B9110C}");
 
-        static void Main(string[] args)
-        {
-            String strServerAddress = args[0];
-            UInt16 usServerPort = UInt16.Parse(args[1]);
-            Guid guidDomainId = Guid.Parse(args[2]);
+		static void Main(string[] args)
+		{
+			String strServerAddress = args[0];
+			UInt16 usServerPort = UInt16.Parse(args[1]);
+			Guid guidDomainId = Guid.Parse(args[2]);
 
-            UInt32 ulStorageId = 0;
+			UInt32 ulStorageId = 0;
 
-            // connect
+			// connect
 
-            ThreadInit.InitializeThread();
+			ThreadInit.InitializeThread();
 
-            Connection pConnection = Connection.Create();
+			Connection pConnection = Connection.Create();
 
-            if (0 > pConnection.Initialize(guidDomainId))
-            {
-                Connection.Destroy(pConnection);
-                ThreadInit.UninitializeThread();
-                return;
-            }
+			if (0 > pConnection.Initialize(guidDomainId))
+			{
+				Connection.Destroy(pConnection);
+				ThreadInit.UninitializeThread();
+				return;
+			}
 
-            if (0 > pConnection.Connect(strServerAddress, usServerPort, null, null))
-            {
-                pConnection.Uninitialize();
-                Connection.Destroy(pConnection);
-                ThreadInit.UninitializeThread();
-                return;
-            }
+			if (0 > pConnection.Connect(strServerAddress, usServerPort, null, null))
+			{
+				pConnection.Uninitialize();
+				Connection.Destroy(pConnection);
+				ThreadInit.UninitializeThread();
+				return;
+			}
 
-            if (0 > pConnection.QueryStorage(ulStorageId, false, null))
-            {
-                pConnection.DisconnectAll();
-                pConnection.Uninitialize();
-                Connection.Destroy(pConnection);
-                ThreadInit.UninitializeThread();
-                return;
-            }
+			if (0 > pConnection.QueryStorage(ulStorageId, false, null))
+			{
+				pConnection.DisconnectAll();
+				pConnection.Uninitialize();
+				Connection.Destroy(pConnection);
+				ThreadInit.UninitializeThread();
+				return;
+			}
 
-            // build domain
+			// build domain
 
-            WDomain pWDomain = WDomain.Create();
-            if (0 > pWDomain.Initialize(pConnection, 0))
-            {
-                WDomain.Destroy(pWDomain);
-                pConnection.ReleaseAllStorages();
-                pConnection.DisconnectAll();
-                pConnection.Uninitialize();
-                Connection.Destroy(pConnection);
-                ThreadInit.UninitializeThread();
-                return;
-            }
+			WDomain pWDomain = WDomain.Create();
+			if (0 > pWDomain.Initialize(pConnection, 0))
+			{
+				WDomain.Destroy(pWDomain);
+				pConnection.ReleaseAllStorages();
+				pConnection.DisconnectAll();
+				pConnection.Uninitialize();
+				Connection.Destroy(pConnection);
+				ThreadInit.UninitializeThread();
+				return;
+			}
 
-            // bind types
+			// bind types
 
-            PrepareDefinition.Bind(pWDomain);
+			PrepareDefinition.Bind(pWDomain);
 
-            // create named object
+			// create named object
 
-            TestRoot pRootObject;
-            TestRoot.Create(out pRootObject, pWDomain, DataFS.ObjectId.OBJECTID_NULL);
+			TestRoot pRootObject;
+			TestRoot.Create(out pRootObject, pWDomain, DataFS.ObjectId.OBJECTID_NULL);
 
-            pRootObject.SetRootName("first test root");
+			pRootObject.SetRootName("first test root");
 
-            pRootObject.StoreData(Transaction.Store);
+			pRootObject.StoreData(Transaction.Store);
 
-            pWDomain.InsertNamedLink(pRootObject.BuildLink(true), guidRootName, "first entry point", Transaction.Store);
+			pWDomain.InsertNamedLink(pRootObject.BuildLink(true), guidRootName, "first entry point", Transaction.Store);
 
-            pWDomain.Execute(Transaction.Store, null);
+			pWDomain.Execute(Transaction.Store, null);
 
-            pRootObject.Dispose();
+			pRootObject.Dispose();
 
-            // unbind types
+			// unbind types
 
-            PrepareDefinition.Unbind();
+			PrepareDefinition.Unbind();
 
-            // destroy domain
+			// destroy domain
 
-            pWDomain.Uninitialize();
-            WDomain.Destroy(pWDomain);
+			pWDomain.Uninitialize();
+			WDomain.Destroy(pWDomain);
 
-            // disconnect
+			// disconnect
 
-            pConnection.ReleaseAllStorages();
-            pConnection.DisconnectAll();
-            pConnection.Uninitialize();
-            Connection.Destroy(pConnection);
-            ThreadInit.UninitializeThread();
-        }
-    }
+			pConnection.ReleaseAllStorages();
+			pConnection.DisconnectAll();
+			pConnection.Uninitialize();
+			Connection.Destroy(pConnection);
+			ThreadInit.UninitializeThread();
+		}
+	}
 }
